@@ -24,8 +24,9 @@ public class TaskConsumer implements Runnable {
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
+            Task task = null;
             try {
-                Task task = taskQueue.takeTask();
+                task = taskQueue.takeTask();
                 task.setStatus(TaskStatus.PROCESSING);
 
                 // Add Task status to the task status tracker
@@ -53,6 +54,24 @@ public class TaskConsumer implements Runnable {
                 break;
             } catch (Exception e) {
                 logger.error("[{}] Error processing task: {}", Thread.currentThread().getName(), e.getMessage(), e);
+
+                if (task != null) {
+                    task.incrementRetry();
+                    if (task.shouldRetry()) {
+                        logger.info("[{}] Retrying Task: {} => Retry Count: {}",
+                                Thread.currentThread().getName(), task.getName(), task.getRetryCount());
+                        taskQueue.submitTask(task);
+                        // Update status to SUBMITTED for retry
+                        task.setStatus(TaskStatus.SUBMITTED);
+                        TaskStatusTracker.updateStatus(task.getId(), task.getStatus());
+                    } else {
+                        task.setStatus(TaskStatus.FAILED);
+                        TaskStatusTracker.updateStatus(task.getId(), TaskStatus.FAILED);
+                        logger.error("[{}] Task permanently failed: {}", Thread.currentThread().getName(),
+                                task.getName());
+                    }
+                }
+
             }
         }
     }

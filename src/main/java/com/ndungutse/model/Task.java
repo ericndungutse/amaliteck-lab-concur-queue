@@ -10,6 +10,8 @@ public class Task implements Comparable<Task> {
     private final Instant createdTimestamp;
     private final String payload;
     private TaskStatus status;
+    private int retryCount = 0;
+    private static final int MAX_RETRIES = 3;
 
     public Task(String name, int priority, String payload) {
         this.id = UUID.randomUUID();
@@ -22,6 +24,18 @@ public class Task implements Comparable<Task> {
 
     public TaskStatus getStatus() {
         return status;
+    }
+
+    public void incrementRetry() {
+        retryCount++;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public boolean shouldRetry() {
+        return retryCount <= MAX_RETRIES;
     }
 
     public void setStatus(TaskStatus status) {
