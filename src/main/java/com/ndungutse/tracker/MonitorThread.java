@@ -1,17 +1,17 @@
 package com.ndungutse.tracker;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 
-import com.ndungutse.model.Task;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndungutse.model.TaskStatus;
 import com.ndungutse.queue.TaskQueue;
 
@@ -27,10 +27,12 @@ public class MonitorThread implements Runnable {
 
     @Override
     public void run() {
+        int counter = 0;
         while (!Thread.interrupted()) {
 
             try {
                 Thread.sleep(500);
+                counter++;
 
                 int queueSize = taskQueue.getQueueSize();
                 int activeThreads = threadPool.getActiveCount();
@@ -47,6 +49,11 @@ public class MonitorThread implements Runnable {
                         poolSize,
                         queuedTasks,
                         statusCounts);
+
+                // every 12 * 5s = 60 seconds
+                if (counter % 12 == 0) {
+                    exportStatusToJson();
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.info("[{}] Monitor thread interrupted, stopping monitoring.", Thread.currentThread().getName());
@@ -69,6 +76,17 @@ public class MonitorThread implements Runnable {
         }
 
         return counts;
+    }
+
+    private void exportStatusToJson() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            File file = new File("task_statuses.json");
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, TaskStatusTracker.getAllStatuses());
+            logger.info("Monitor: Exported task status to {}", file.getAbsolutePath());
+        } catch (Exception e) {
+            logger.error("Monitor: Failed to export task status to JSON: {}", e.getMessage(), e);
+        }
     }
 
 }
