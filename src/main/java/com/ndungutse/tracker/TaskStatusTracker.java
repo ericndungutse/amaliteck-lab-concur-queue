@@ -9,19 +9,30 @@ import com.ndungutse.model.TaskStatus;
 public class TaskStatusTracker {
     private final ConcurrentHashMap<UUID, TaskStatus> statusMap = new ConcurrentHashMap<>();
 
-    public void record(Task task) {
-        statusMap.put(task.getId(), task.getStatus());
+    private TaskStatusTracker() {
+    };
+
+    private static class Holder {
+        private static final TaskStatusTracker INSTANCE = new TaskStatusTracker();
     }
 
-    public void updateStatus(UUID taskId, TaskStatus status) {
-        statusMap.put(taskId, status);
+    private static TaskStatusTracker getInstance() {
+        return Holder.INSTANCE;
     }
 
-    public TaskStatus getStatus(UUID taskId) {
-        return statusMap.get(taskId);
+    public static void record(Task task) {
+        getInstance().statusMap.put(task.getId(), task.getStatus());
     }
 
-    public ConcurrentHashMap<UUID, TaskStatus> getAllStatuses() {
-        return statusMap;
+    public static void updateStatus(UUID taskId, TaskStatus status) {
+        getInstance().statusMap.put(taskId, status);
+    }
+
+    public static TaskStatus getStatus(UUID taskId) {
+        return getInstance().statusMap.get(taskId);
+    }
+
+    public static ConcurrentHashMap<UUID, TaskStatus> getAllStatuses() {
+        return getInstance().statusMap;
     }
 }
