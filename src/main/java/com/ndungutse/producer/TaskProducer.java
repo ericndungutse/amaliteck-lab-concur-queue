@@ -1,11 +1,13 @@
 package com.ndungutse.producer;
 
-import com.ndungutse.model.Task;
-import com.ndungutse.queue.TaskQueue;
+import java.time.LocalDateTime;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
+import com.ndungutse.model.Task;
+import com.ndungutse.queue.TaskQueue;
 
 public class TaskProducer implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(TaskProducer.class);
@@ -34,7 +36,8 @@ public class TaskProducer implements Runnable {
                         "Payload for " + producerName + "-Task-" + i);
 
                 taskQueue.submitTask(task);
-                logger.info("[{}] Submitted: {}", producerName, task);
+                logger.info("[{}] Submitted Task: {} => {} at {}",
+                        Thread.currentThread().getName(), task.getName(), task.getStatus(), LocalDateTime.now());
 
             }
         } catch (InterruptedException e) {
