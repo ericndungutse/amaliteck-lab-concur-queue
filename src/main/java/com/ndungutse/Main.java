@@ -18,7 +18,6 @@ public class Main {
         producer2.start();
         producer3.start();
 
-        // Wait for producers to finish
         // Consumers
         ExecutorService workerPool = Executors.newFixedThreadPool(3);
         for (int i = 1; i <= 3; i++) {
