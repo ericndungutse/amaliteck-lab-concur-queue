@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ndungutse.model.Task;
+import com.ndungutse.model.TaskStatus;
 import com.ndungutse.queue.TaskQueue;
 import com.ndungutse.tracker.TaskStatusTracker;
 
@@ -41,8 +42,10 @@ public class TaskProducer implements Runnable {
                 // Add task status in status tracker
                 TaskStatusTracker.record(task);
 
+                final TaskStatus statusAtSubmission = TaskStatus.SUBMITTED;
+
                 logger.info("[{}] Submitted Task: {} => {} at {}",
-                        Thread.currentThread().getName(), task.getName(), task.getStatus(), LocalDateTime.now());
+                        Thread.currentThread().getName(), task.getName(), statusAtSubmission, LocalDateTime.now());
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

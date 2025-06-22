@@ -39,15 +39,18 @@ public class MonitorThread implements Runnable {
                 int poolSize = threadPool.getPoolSize();
                 int queuedTasks = threadPool.getQueue().size();
 
+                int processedTasks = TaskStats.getProcessedCount();
+
                 Map<TaskStatus, Integer> statusCounts = countTaskStatuses();
 
                 logger.info(
-                        "[{}] Queue size: {}, ThreadPool active: {}, pool size: {}, queued tasks: {}, Task status counts: {}",
+                        "[{}] Queue size: {}, ThreadPool active: {}, pool size: {}, queued tasks: {}, processed tasks: {}, Task status counts: {}",
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                         queueSize,
                         activeThreads,
                         poolSize,
                         queuedTasks,
+                        processedTasks,
                         statusCounts);
 
                 // every 12 * 5s = 60 seconds

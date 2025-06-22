@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.ndungutse.model.Task;
 import com.ndungutse.model.TaskStatus;
 import com.ndungutse.queue.TaskQueue;
+import com.ndungutse.tracker.TaskStats;
 import com.ndungutse.tracker.TaskStatusTracker;
 
 public class TaskConsumer implements Runnable {
@@ -38,6 +39,8 @@ public class TaskConsumer implements Runnable {
                 Thread.sleep(new Random().nextInt(1000, 3000));
 
                 task.setStatus(TaskStatus.COMPLETED);
+
+                TaskStats.incrementProcessedCount();
 
                 // Add Task status to the task status tracker
                 TaskStatusTracker.updateStatus(task.getId(), task.getStatus());
