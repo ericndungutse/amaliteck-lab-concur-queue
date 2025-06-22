@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.ndungutse.model.Task;
 import com.ndungutse.model.TaskStatus;
 import com.ndungutse.queue.TaskQueue;
+import com.ndungutse.tracker.TaskStatusTracker;
 
 public class TaskConsumer implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(TaskConsumer.class);
@@ -23,15 +24,24 @@ public class TaskConsumer implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                Thread.sleep(new Random().nextInt(1000, 3000));
-                // Simulate Processing
                 Task task = taskQueue.takeTask();
-
                 task.setStatus(TaskStatus.PROCESSING);
-                logger.info("[{}] Processing Task: {} => {} at {}",
-                        Thread.currentThread().getName(), task.getName(), task.getStatus(), LocalDateTime.now());
+
+                // Add Task status to the task status tracker
+                TaskStatusTracker.updateStatus(task.getId(), task.getStatus());
+
+                logger.info(
+                        "[{}] Processing Task: {} => {} at {}", Thread.currentThread().getName(), task.getName(),
+                        task.getStatus(), LocalDateTime.now());
+
+                // Simulate Processing
+                Thread.sleep(new Random().nextInt(1000, 3000));
 
                 task.setStatus(TaskStatus.COMPLETED);
+
+                // Add Task status to the task status tracker
+                TaskStatusTracker.updateStatus(task.getId(), task.getStatus());
+
                 logger.info("[{}] Completed Task: {} => {} at {}",
                         Thread.currentThread().getName(), task.getName(), task.getStatus(), LocalDateTime.now());
             } catch (InterruptedException e) {
