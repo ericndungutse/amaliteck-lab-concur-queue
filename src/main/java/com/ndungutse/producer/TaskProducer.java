@@ -25,6 +25,7 @@ public class TaskProducer implements Runnable {
     public void run() {
         try {
             for (int i = 1; i <= numberOfTasks; i++) {
+                Thread.sleep(random.nextInt(500, 1000));
                 int priority = (i % 3 == 0) ? 10 : random.nextInt(5) + 1;
 
                 Task task = new Task(
@@ -35,7 +36,6 @@ public class TaskProducer implements Runnable {
                 taskQueue.submitTask(task);
                 logger.info("[{}] Submitted: {}", producerName, task);
 
-                Thread.sleep(random.nextInt(3000) + 1000); // Simulated delay
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -17,4 +17,10 @@ public class TaskQueue {
     public int getQueueSize() {
         return queue.size();
     }
+
+    @Override
+    public String toString() {
+        return "TaskQueue [queue=" + queue + "]";
+    }
+
 }
