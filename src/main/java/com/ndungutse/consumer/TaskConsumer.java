@@ -1,5 +1,6 @@
 package com.ndungutse.consumer;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -22,17 +23,17 @@ public class TaskConsumer implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
+                Thread.sleep(new Random().nextInt(1000, 3000));
+                // Simulate Processing
                 Task task = taskQueue.takeTask();
 
                 task.setStatus(TaskStatus.PROCESSING);
-                logger.info("[{}] Started processing Task: {} at {}",
-                        Thread.currentThread().getName(), task.getName(), System.currentTimeMillis());
-
-                Thread.sleep(new Random().nextInt(500, 1000));
+                logger.info("[{}] Processing Task: {} => {} at {}",
+                        Thread.currentThread().getName(), task.getName(), task.getStatus(), LocalDateTime.now());
 
                 task.setStatus(TaskStatus.COMPLETED);
-                logger.info("[{}] Completed processing Task: {} at {}",
-                        Thread.currentThread().getName(), task.getName(), System.currentTimeMillis());
+                logger.info("[{}] Completed Task: {} => {} at {}",
+                        Thread.currentThread().getName(), task.getName(), task.getStatus(), LocalDateTime.now());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.info("[{}] Interrupted, stopping consumer.", Thread.currentThread().getName());
