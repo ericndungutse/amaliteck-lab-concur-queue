@@ -51,7 +51,7 @@ public class TaskConsumer implements Runnable {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.info("[{}] Interrupted, stopping consumer.", Thread.currentThread().getName());
-                break;
+                // break;
             } catch (Exception e) {
                 logger.error("[{}] Error processing task: {}", Thread.currentThread().getName(), e.getMessage(), e);
 
